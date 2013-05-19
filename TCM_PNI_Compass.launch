@@ -1,0 +1,14 @@
+<launch>
+ <!--node pkg="fieldforce_tcm" type="compass.py" name="TCM_PNI_Compass" respawn="true" output="screen"-->
+ <node pkg="fieldforce_tcm" type="compass.py" name="TCM_PNI_Compass" output="screen">
+    <param name="path" value="/dev/ttyUSB0" />
+    <param name="baud" value="115200" />
+    
+    <!-- from http://www.ngdc.noaa.gov/geomag-web/#declination  -->
+    <!--# Detroit Magnetic declination           : 2013-06-10 	7 30' 6"  W changing by  2.7' W per year = -7 30'6"=-7.501666666666667 degree -->
+    <!--# Oakland University Magnetic declination: 2013-06-10 	7 27' 46" W changing by  2.7' W per year =         =-7.462777777777778 degree -->
+    <param name="declination" value="-7.501666666666667" />
+
+    <remap from="compass" to="PNI_compass/data"/>
+ </node>
+</launch>
