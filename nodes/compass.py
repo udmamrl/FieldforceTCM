@@ -75,16 +75,17 @@ def main():
     mag_slot = rospy.get_param('~mag_slot', 0)
     accel_slot = rospy.get_param('~accel_slot', 0)
 
-    path  = rospy.get_param('~path')
-    baud  = rospy.get_param('~baud', 38400)
+    path  = rospy.get_param('~path','/dev/ttyUSB0')
+    baud  = rospy.get_param('~baud', 115200)
     frame = rospy.get_param('~frame_id', '/base_link')
     cov   = rospy.get_param('~covariance', [
         inf, 0.0, 0.0,
         0.0, inf, 0.0,
         0.0, 0.0, var
     ])
-    declination = rospy.get_param('~declination', 0.0)
-    hack_value  = rospy.get_param('~hack_value', 0.0)
+    declination   = rospy.get_param('~declination', 0.0)
+    UseEastAsZero = rospy.get_param('~UseEastAsZero',True)
+    #hack_value  = rospy.get_param('~hack_value', 0.0)
 
     try:
         compass = FieldforceTCM(path, baud)
@@ -127,7 +128,11 @@ def main():
         # FIXME: This should not be negated.
         ax = math.radians(datum.RAngle)
         ay = math.radians(datum.PAngle)
-        az = -math.radians(datum.Heading) + hack_value
+        if UseEastAsZero :
+            az = -math.radians(datum.Heading) +math.pi/2.- declination
+        else:
+            az = -math.radians(datum.Heading) - declination
+        
         quaternion = transformations.quaternion_from_euler(ax, ay, az)
 
         # FIXME
